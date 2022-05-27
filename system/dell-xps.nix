@@ -5,29 +5,18 @@
 { config, lib, pkgs, inputs, ... }:
 
 let
-  customFonts = pkgs.nerdfonts.override {
-    fonts = [
-      "JetBrainsMono"
-      "Iosevka"
-    ];
-  };
+  customFonts =
+    pkgs.nerdfonts.override { fonts = [ "JetBrainsMono" "Iosevka" ]; };
 
   myfonts = pkgs.callPackage fonts/default.nix { inherit pkgs; };
-in
-{
-  imports =
-    [
-      # Window manager
-      ./wm/xmonad.nix
-      # Binary cache
-     ./cachix.nix
-    ];
+in {
+  imports = [ ./wm/xmonad.nix ];
 
   networking = {
     # Enables wireless support and openvpn via network manager.
     networkmanager = {
-      enable   = true;
-      #packages = [ pkgs.networkmanager-openvpn ];
+      enable = true;
+      plugins = [ pkgs.networkmanager-openvpn ];
     };
 
     # The global useDHCP flag is deprecated, therefore explicitly set to false here.
@@ -48,17 +37,13 @@ in
 
   # List packages installed in system profile. To search, run:
   # $ nix search wget
-  environment.systemPackages = with pkgs; [
-    firejail
-    vim
-    wget
-  ];
+  environment.systemPackages = with pkgs; [ firejail vim neovim wget ];
 
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
   # programs.mtr.enable = true;
   programs.gnupg.agent = {
-    enable           = true;
+    enable = true;
     enableSSHSupport = true;
   };
 
@@ -96,13 +81,22 @@ in
 
   hardware.pulseaudio = {
     enable = true;
-#    extraModules = [ pkgs.pulseaudio-modules-bt ];
     package = pkgs.pulseaudioFull;
   };
 
-
   services = {
     # Enable the OpenSSH daemon.
+    avahi = {
+      nssmdns = true;
+      enable = true;
+      ipv4 = true;
+      ipv6 = true;
+      publish = {
+        enable = true;
+        addresses = true;
+        workstation = true;
+      };
+    };
     fwupd.enable = true;
     openssh = {
       enable = true;
@@ -127,12 +121,13 @@ in
   ];
 
   programs.fish.enable = true;
+  programs.zsh.enable = true;
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users.users.joe = {
     isNormalUser = true;
-    extraGroups  = [ "docker" "networkmanager" "wheel" ]; # wheel for ‘sudo’.
-    shell        = pkgs.fish;
+    extraGroups = [ "docker" "networkmanager" "wheel" ]; # wheel for ‘sudo’.
+    shell = pkgs.zsh;
   };
 
   security = {
@@ -158,14 +153,14 @@ in
     # Automate garbage collection
     gc = {
       automatic = true;
-      dates     = "weekly";
-      options   = "--delete-older-than 7d";
+      dates = "weekly";
+      options = "--delete-older-than 7d";
     };
 
     # Flakes settings
     package = pkgs.nixFlakes;
     #registry.nixpkgs.flake = inputs.nixpkgs;
-    trustedUsers  = [ "root" "joe" ];
+    trustedUsers = [ "root" "joe" ];
 
     # Avoid unwanted garbage collection when using nix-direnv
     extraOptions = ''

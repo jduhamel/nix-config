@@ -3,12 +3,13 @@
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
 {
-  imports =
-    [
-      <nixos-hardware/dell/xps/13-9380>
-      ./hardware-configuration.nix
-      ./boot-load.nix
-      ./dell-xps.nix
-      ./wm/xmonad.nix
-    ];
+  imports = [
+    ./cachix.nix
+    <nixos-hardware/dell/xps/13-9380>
+    ./hardware-configuration.nix
+    ./hidpi.nix
+    ./boot-load.nix
+    ./dell-xps.nix
+    ./wm/xmonad.nix
+  ];
 }
