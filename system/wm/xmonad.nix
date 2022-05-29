@@ -37,6 +37,12 @@
         enableContribAndExtras = true;
       };
 
+
+      windowManager.i3 = {
+        enable = true;
+        package = pkgs.i3-gaps;
+      }
+
       # does not work, setting it manually on start up
       xkbOptions = "ctrl:nocaps";
 

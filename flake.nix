@@ -1,10 +1,22 @@
 {
-  description = "Home Manager (dotfiles) and NixOS configurations";
+  description = "jduhamel's nixos config";
+    nixConfig.substituters = [
+    "https://cache.nixos.org"
+    "https://jduhamel-nixos.cachix.org"
+    "https://nix-community.cachix.org"
+    "https://pre-commit-hooks.cachix.org"
+  ];
+  nixConfig.trusted-public-keys = [
+    "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
+    "jduhamel-nixos.cachix.org-1:jwXnlnlOileKAFwgn/jddIc43hyy+D32nFtodwvbsyU="
+    "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
+    "pre-commit-hooks.cachix.org-1:Pkk3Panw5AW24TOv6kz3PvLhlH8puAsJTBbOPmBo7Rc="
+  ];
 
   inputs = {
     nixpkgs.url = "nixpkgs/nixos-unstable";
 
-nixos-hardware.url = github:NixOS/nixos-hardware/master;
+    nixos-hardware.url = github:NixOS/nixos-hardware/master;
 
     nurpkgs = {
       url = github:nix-community/NUR;
@@ -16,13 +28,31 @@ nixos-hardware.url = github:NixOS/nixos-hardware/master;
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    tex2nix = {
-      url = github:Mic92/tex2nix/4b17bc0;
-      inputs.utils.follows = "nixpkgs";
+    impermanence.url = "github:nix-community/impermanence";
+
+    pre-commit-hooks = {
+      url = "github:cachix/pre-commit-hooks.nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.flake-utils.follows = "utils";
     };
+
+    sops-nix = {
+      url = "github:Mic92/sops-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    ragenix = {
+      url = "github:yaxitech/ragenix";
+      inputs.flake-utils.follows = "utils";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    nur.url = "nur";
+    emacs-overlay.url = "github:nix-community/emacs-overlay";
+    templates.url = "github:NixOS/templates";
   };
 
-  outputs = inputs @ { self, nixpkgs, nixos-hardware, nurpkgs, home-manager, tex2nix }:
+  outputs = inputs @ { self, nixpkgs, ... }@inputs:
     let
       system = "x86_64-linux";
     in
@@ -33,11 +63,9 @@ nixos-hardware.url = github:NixOS/nixos-hardware/master;
         }
       );
 
-#       modules = [
-        # ...
-        # add your model from this list: https://github.com/NixOS/nixos-hardware/blob/master/flake.nix
-#        nixos-hardware.nixosModules.dell-xps-13-9380
-#      ];
+       modules = [
+        nixos-hardware.nixosModules.dell-xps-13-9380
+     ];
 
     nixosConfigurations = (
         import ./outputs/nixos-conf.nix {

@@ -1,0 +1,10 @@
+[
+  ./autorandr
+  ./dconf
+  ./kitty
+  ./git
+  ./fish
+  ./neovim
+  ./rofi
+  ./yubikey
+]
